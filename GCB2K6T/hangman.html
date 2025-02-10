@@ -1,0 +1,232 @@
+<!--# Hangman created by KeatonMayhem (C) 2025-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>GCB2K6T</title>
+    <style>
+        body { font-family: monospace, Arial, sans-serif; margin: 20px; text-align: center; background-color: #111; color: #ddd;}
+        #game { max-width: 600px; margin: auto; padding: 20px; border: 1px solid #333; background-color: #222; }
+        .word { letter-spacing: 10px; font-size: 24px; }
+        .ascii-art { white-space: pre; font-size: 18px; }
+        pre { white-space: pre-wrap; text-align: center; font-size: 14px; line-height: 1.2; }
+        .choice { display: block; margin: 10px auto; padding: 10px; cursor: pointer; background-color: #444; color: white; border: none; }
+        .choice:hover { background-color: #666; }
+        #coordinates { font-weight: bold; color: green; display: none; font-size: 20px; white-space: nowrap; }
+        .incorrect { color: red; font-weight: bold; }
+        #message.lose { color: red; font-weight: bold; }
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <h1>GCB2K6T</h1>
+    <!--<h2>Hangman Game</h2>-->
+    
+    <!-- Display the category -->
+    <p id="category-display">Category: <strong><span id="category-text"></span></strong></p>
+    <p id="message"></p>
+    <div id="coordinates"></div>
+    <div class="ascii-art" id="hangman"></div>
+    <div class="word" id="word-display"></div>
+    <p>Guess a letter:</p>
+    <input type="text" id="guess" maxlength="1" onkeypress="handleKeyPress(event)">
+    <button id="submit-button" onclick="makeGuess()">Submit</button>
+    <button id="restart-button" style="display:none;" onclick="restartGame()">Restart</button>
+        <!--    
+            ############################################################
+            If you are reading this,
+            Cheater, cheater, pumpkin eater.
+            But also, smart. Good luck on finding the cache!
+            ############################################################
+    -->
+    <script>
+        //Prevents from the screen moving
+            window.visualViewport.addEventListener("resize", () => {
+                document.body.style.height = `${window.visualViewport.height}px`;
+            });
+        
+            document.getElementById("guess").addEventListener("focus", function() {
+                document.body.style.overflow = "hidden";
+            });
+        
+            document.getElementById("guess").addEventListener("blur", function() {
+                document.body.style.overflow = "auto";
+            });
+        // Categorized word list
+        const words = [
+            { word: "apple", category: "Food" },
+            { word: "banana", category: "Food" },
+            { word: "grapes", category: "Food" },
+            { word: "orange", category: "Food" },
+            { word: "cookie", category: "Food" },
+            { word: "candle", category: "Household Items" },
+            { word: "pencil", category: "School Supplies" },
+            { word: "butter", category: "Food" },
+            { word: "garden", category: "Nature" },
+            { word: "rocket", category: "Space" },
+            { word: "ticket", category: "Entertainment" },
+            { word: "planet", category: "Space" },
+            { word: "monkey", category: "Animals" },
+            { word: "silver", category: "Metals" },
+            { word: "breeze", category: "Weather" },
+            { word: "puzzle", category: "Games" },
+            { word: "summer", category: "Seasons" },
+            { word: "cactus", category: "Plants" },
+            { word: "guitar", category: "Music" },
+            { word: "sunset", category: "Nature" },
+            { word: "rabbit", category: "Animals" },
+            { word: "soccer", category: "Sports" },
+            { word: "tunnel", category: "Structures" },
+            { word: "yellow", category: "Colors" },
+            { word: "window", category: "Household Items" },
+            { word: "basket", category: "Objects" },
+            { word: "splash", category: "Water" },
+            { word: "bottle", category: "Household Items" },
+            { word: "goblin", category: "Fantasy" },
+            { word: "giraffe", category: "Animals" },
+            { word: "jaguar", category: "Animals" },
+            { word: "puffin", category: "Animals" },
+            { word: "wombat", category: "Animals" },
+            { word: "ocelot", category: "Animals" },
+            { word: "explore", category: "Verbs" },
+            { word: "rescue", category: "Verbs" },
+            { word: "swimmer", category: "Verbs" },
+            { word: "chasing", category: "Verbs" },
+            { word: "trapped", category: "Verbs" },
+            { word: "concert", category: "Entertainment" },
+            { word: "theater", category: "Entertainment" },
+            { word: "comedy", category: "Entertainment" },
+            { word: "jukebox", category: "Entertainment" },
+            { word: "cartoon", category: "Entertainment" },
+            { word: "sunrise", category: "Nature" },
+            { word: "harvest", category: "Nature" },
+            { word: "volcano", category: "Nature" },
+            { word: "tornado", category: "Nature" },
+            { word: "glacier", category: "Nature" },
+            { word: "history", category: "Academics" },
+            { word: "science", category: "Academics" },
+            { word: "physics", category: "Academics" },
+            { word: "grammar", category: "Academics" },
+            { word: "college", category: "Academics" },
+            { word: "cyclone", category: "Weather" },
+            { word: "thunder", category: "Weather" },
+            { word: "blazing", category: "Weather" },
+            { word: "drizzle", category: "Weather" },
+            { word: "hammock", category: "Objects" },
+            { word: "blanket", category: "Objects" },
+            { word: "luggage", category: "Objects" },
+            { word: "candle", category: "Objects" }
+        ];
+
+        let chosenWordObj = words[Math.floor(Math.random() * words.length)];
+        let chosenWord = chosenWordObj.word;
+        let chosenCategory = chosenWordObj.category;
+        let guessedLetters = new Set();
+        let wrongGuesses = 0;
+        const maxGuesses = 6;
+        
+        const hangmanStages = [
+            `+---+\n |   |\n     |\n     |\n     |\n     |\n=========`,
+            `+---+\n |   |\n O   |\n     |\n     |\n     |\n=========`,
+            `+---+\n |   |\n O   |\n |   |\n     |\n     |\n=========`,
+            `+---+\n |   |\n O   |\n/|   |\n     |\n     |\n=========`,
+            `+---+\n |   |\n O   |\n/|\\  |\n     |\n     |\n=========`,
+            `+---+\n |   |\n O   |\n/|\\  |\n/    |\n     |\n=========`,
+            `+---+\n |   |\n O   |\n/|\\  |\n/ \\  |\n     |\n=========`
+        ];
+        
+        function updateDisplay() {
+            document.getElementById("word-display").innerHTML = chosenWord
+                .split("")
+                .map(letter => guessedLetters.has(letter) 
+                    ? `<span class='correct'>${letter}</span>` 
+                    : "_")
+                .join(" ");
+            document.getElementById("hangman").textContent = hangmanStages[wrongGuesses];
+            document.getElementById("category-text").textContent = chosenCategory; // Update category display
+        }
+        
+        function makeGuess() {
+            let guess = document.getElementById("guess").value.toLowerCase();
+            document.getElementById("guess").value = "";
+            if (guess.length !== 1 || !/[a-z]/.test(guess)) {
+                document.getElementById("message").textContent = "Please enter a valid letter.";
+                return;
+            }
+            if (guessedLetters.has(guess)) {
+                document.getElementById("message").textContent = "You've already guessed that letter.";
+                return;
+            }
+            guessedLetters.add(guess);
+            if (!chosenWord.includes(guess)) {
+                wrongGuesses++;
+                document.getElementById("message").innerHTML = `<span class='incorrect'>Incorrect guess!</span>`;
+            } else {
+                document.getElementById("message").innerHTML = `<span class='correct'>Good guess!</span>`;
+            }
+            updateDisplay();
+            checkGameOver();
+        }
+        
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                makeGuess();
+            }
+        }
+        
+        function checkGameOver() {
+            const displayedWord = chosenWord.split("").map(letter => guessedLetters.has(letter) ? letter : "_").join("");
+
+            if (displayedWord === chosenWord) {
+                document.getElementById("message").textContent = "Congratulations! You guessed the word!";
+                displayCoordinates();
+                endGame();
+            } else if (wrongGuesses >= maxGuesses) {
+                document.getElementById("message").textContent = "Game Over! The word was " + chosenWord;
+                document.getElementById("message").classList.add("lose");
+                endGame();
+            }
+        }
+                
+        function endGame() {
+            document.getElementById("guess").disabled = true;
+            document.getElementById("submit-button").disabled = true;
+            document.getElementById("restart-button").style.display = "inline-block";
+        }
+        
+        function displayCoordinates() {
+            const coordinates = "N 39° 33.570′ W 86° 05.270′";
+            const coordinatesElement = document.getElementById("coordinates");
+            coordinatesElement.style.display = "inline-block";
+            coordinatesElement.textContent = coordinates;
+        }
+        
+        function restartGame() {
+            chosenWordObj = words[Math.floor(Math.random() * words.length)];
+            chosenWord = chosenWordObj.word;
+            chosenCategory = chosenWordObj.category;
+            guessedLetters = new Set();
+            wrongGuesses = 0;
+            updateDisplay();
+            document.getElementById("guess").disabled = false;
+            document.getElementById("submit-button").disabled = false;
+            document.getElementById("restart-button").style.display = "none";
+            document.getElementById("message").textContent = "";
+            document.getElementById("message").classList.remove("lose");
+            document.getElementById("coordinates").style.display = "none";
+        }
+        
+        updateDisplay();
+    </script>
+</body>
+<br>
+<br>
+<br>
+# Hangman created by KeatonMayhem (C) 2025
+</html>

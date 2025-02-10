@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simon Says Geocache Puzzle</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    .container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 10px; /* Adds spacing between buttons */
+        max-width: 220px; /* Ensures two buttons per row */
+        margin: 0 auto; /* Centers the container */
+    }
+    .color-btn {
+      width: 100px;
+      height: 100px;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s, opacity 0.3s;
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+    }
+    #btn1 { background-color: red; opacity : 0.2; }
+    #btn2 { background-color: blue; opacity : 0.2; }
+    #btn3 { background-color: green; opacity : 0.2; }
+    #btn4 { background-color: orange; opacity : 0.2; }
+    .hidden { display: none; }
+    .disabled { pointer-events: none; opacity: 0.6; }
+  </style>
+</head>
+<body>
+
+<h1>Simon Says - Geocache Puzzle</h1>
+<p>Repeat the color sequence to unlock the hint!</p>
+
+<div class="container">
+  <button id="btn1" class="color-btn disabled" onclick="playerTurn(1)">1</button>
+  <button id="btn2" class="color-btn disabled" onclick="playerTurn(2)">2</button>
+  <button id="btn3" class="color-btn disabled" onclick="playerTurn(3)">3</button>
+  <button id="btn4" class="color-btn disabled" onclick="playerTurn(4)">4</button>
+</div>
+
+<p id="game-message">Memorize the sequence!</p>
+<p id="hint" class="hidden">Coordinates: N40° 44.100 W073° 59.024</p>
+<p id="continue-link" class="hidden"><a href="simon_infinite.html">Continue to Infinite Mode?</a></p>
+<div id="countdown" style="display:none; font-size: 24px; text-align: center;"></div>
+
+<script>
+  let sequence = [];
+  let playerSequence = [];
+  let round = 1;
+  const totalRounds = 3; // Number of rounds to win
+  const firstRoundSteps = 5; // First round starts with 5 steps
+  const buttons = document.querySelectorAll(".color-btn");
+  const buttonFrequencies = {
+        1: 261.6, // C4 - Red
+        2: 329.6, // E4 - Blue
+        3: 392.0, // G4 - Green
+        4: 523.3  // C5 - Orange
+    };
+
+
+  function disableButtons(state) {
+    buttons.forEach(btn => {
+      if (state) {
+        btn.classList.add("disabled");
+      } else {
+        btn.classList.remove("disabled");
+      }
+    });
+  }
+
+  function generateSequence(startingLength) {
+    sequence = [];
+    for (let i = 0; i < startingLength; i++) {
+      sequence.push(Math.floor(Math.random() * 4) + 1);
+    }
+  }
+
+  function addNextStep() {
+    sequence.push(Math.floor(Math.random() * 4) + 1);
+  }
+
+  function flashButton(num) {
+    let button = document.getElementById(`btn${num}`);
+    button.style.opacity = 1;
+    playTone(buttonFrequencies[num]); // Play sound
+    setTimeout(() => { button.style.opacity = 0.2; }, 300);
+  }
+
+  function playerflashButton(num) {
+    let button = document.getElementById(`btn${num}`);
+    button.style.opacity = 1;
+    playTone(buttonFrequencies[num]); // Shorter duration for player
+    setTimeout(() => { button.style.opacity = 0.2; }, 100);
+  }
+
+  function playSequence() {
+    disableButtons(true);
+    let index = 0;
+    document.getElementById('game-message').textContent = `Round ${round}: Watch the sequence!`;
+
+    const interval = setInterval(() => {
+      flashButton(sequence[index]);
+      index++;
+      if (index >= sequence.length) {
+        clearInterval(interval);
+        document.getElementById('game-message').textContent = 'Your turn! Repeat the sequence!';
+        disableButtons(false);
+      }
+    }, 800);
+  }
+
+  function playerTurn(num) {
+    playerSequence.push(num);
+    playerflashButton(num);
+
+    if (playerSequence[playerSequence.length - 1] !== sequence[playerSequence.length - 1]) {
+      document.getElementById('game-message').textContent = 'Wrong! Restarting at Round 1...';
+      round = 1;
+      setTimeout(startGame, 1000);
+      return;
+    }
+
+    if (playerSequence.length === sequence.length) {
+      if (round === totalRounds) {
+        document.getElementById('game-message').textContent = 'You did it! Here is your hint:';
+        document.getElementById('hint').classList.remove('hidden');
+        document.getElementById('continue-link').classList.remove('hidden');
+        disableButtons(true);
+      } else {
+        document.getElementById('game-message').textContent = `Great! Get ready for Round ${round + 1}...`;
+        round++;
+        setTimeout(nextRound, 1000);
+      }
+    }
+  }
+
+  function nextRound() {
+    playerSequence = [];
+    addNextStep(); // Add 1 extra step each round
+    playSequence();
+  }
+
+  function startGame() {
+    document.getElementById('hint').classList.add('hidden');
+    document.getElementById('continue-link').classList.add('hidden');
+    playerSequence = [];
+    round = 1;
+    generateSequence(firstRoundSteps);
+    playSequence();
+  }
+
+  function startCountdown() {
+        let countdown = 3;
+        const countdownElement = document.getElementById("countdown");
+
+        countdownElement.style.display = "block"; // Show countdown text
+        countdownElement.textContent = `Starting in ${countdown}...`;
+
+        const interval = setInterval(() => {
+            countdown--;
+            if (countdown > 0) {
+                countdownElement.textContent = `Starting in ${countdown}...`;
+            } else {
+                clearInterval(interval);
+                countdownElement.style.display = "none"; // Hide countdown
+                startGame(); // Start the game after countdown
+            }
+        }, 1000);
+    }
+
+    function playTone(frequency, duration = 300) {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+
+        oscillator.type = "sine";
+        oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime); // Volume control
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        oscillator.start();
+        setTimeout(() => {
+            oscillator.stop();
+        }, duration);
+    }
+
+
+startCountdown();
+</script>
+
+</body>
+</html>
