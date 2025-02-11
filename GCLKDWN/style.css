@@ -1,0 +1,11 @@
+body { font-family: Arial, sans-serif; text-align: center; }
+.guess-container { display: flex; justify-content: center; margin: 10px; }
+.digit { width: 40px; height: 40px; margin: 5px; text-align: center; font-size: 24px; display: flex; align-items: center; justify-content: center; border: 1px solid black; }
+.numpad { display: grid; grid-template-columns: repeat(3, 1fr); width: 200px; margin: 20px auto; }
+.numpad button { font-size: 24px; padding: 10px; margin: 5px; }
+.correct { background-color: green; color: white; }
+.misplaced { background-color: yellow; color: black; }
+.incorrect { background-color: gray; color: white; }
+.hidden { display: none; }
+#restart-btn { width: 150px; height: 50px; font-size: 20px; padding: 10px; margin-top: 20px; border-radius: 10px; background-color: red; color: white; border: none; }
+#restart-btn:active { transform: scale(0.95); background-color: darkred; }
