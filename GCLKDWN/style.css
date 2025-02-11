@@ -1,8 +1,9 @@
-body { font-family: Arial, sans-serif; text-align: center; }
+body { font-family: Arial, sans-serif; text-align: center; touch-action: none;flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; }
 .guess-container { display: flex; justify-content: center; margin: 10px; }
 .digit { width: 40px; height: 40px; margin: 5px; text-align: center; font-size: 24px; display: flex; align-items: center; justify-content: center; border: 1px solid black; }
-.numpad { display: grid; grid-template-columns: repeat(3, 1fr); width: 200px; margin: 20px auto; }
-.numpad button { font-size: 24px; padding: 10px; margin: 5px; }
+.numpad button { width: 100%; height: 60px; font-size: 24px; border: none; background-color: #ddd; transition: background 0.2s; }
+.numpad button:active {background-color: #bbb;}
+.numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; width: 90vw; max-width: 200px; margin: auto; }
 .correct { background-color: green; color: white; }
 .misplaced { background-color: yellow; color: black; }
 .incorrect { background-color: gray; color: white; }
