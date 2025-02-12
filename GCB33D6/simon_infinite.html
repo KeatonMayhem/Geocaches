@@ -8,51 +8,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="white">
   <title>Simon Infinite</title>
-  <style>
-    .screen {
-      display: none; /* Hide all screens by default */
-      text-align: center;
-      padding: 20px;
-    }
-    .active {display: block; /* Show only the active screen */}
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 20px;
-      touch-action: none;
-    }
-    .container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-        gap: 10px; /* Adds spacing between buttons */
-        max-width: 220px; /* Ensures two buttons per row */
-        margin: 0 auto; /* Centers the container */
-    }
-    .color-btn {
-      width: 100px;
-      height: 100px;
-      margin: 10px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background-color 0.3s, opacity 0.3s;
-      font-size: 24px;
-      font-weight: bold;
-      color: white;
-    }
-    #btn1 { background-color: red; opacity : 0.2; }
-    #btn2 { background-color: blue; opacity : 0.2; }
-    #btn3 { background-color: green; opacity : 0.2; }
-    #btn4 { background-color: orange; opacity : 0.2; }
-    #highscoreList {
-    list-style-type: none;
-    padding: 0;
-    font-size: 20px;
-    font-weight: bold;
-    }
-    .hidden { display: none; }
-    .disabled { pointer-events: none; opacity: 0.6; }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 

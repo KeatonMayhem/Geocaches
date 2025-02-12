@@ -1,0 +1,14 @@
+body { font-family: monospace, Arial, sans-serif; margin: 20px; text-align: center; background-color: #111; color: #ddd;}
+#game { max-width: 600px; margin: auto; padding: 20px; border: 1px solid #333; background-color: #222; }
+.word { letter-spacing: 10px; font-size: 24px; }
+.ascii-art { white-space: pre; font-size: 18px; }
+pre { white-space: pre-wrap; text-align: center; font-size: 14px; line-height: 1.2; }
+.choice { display: block; margin: 10px auto; padding: 10px; cursor: pointer; background-color: #444; color: white; border: none; }
+.choice:hover { background-color: #666; }
+#coordinates { font-weight: bold; color: green; display: none; font-size: 20px; white-space: nowrap; }
+.incorrect { color: red; font-weight: bold; }
+#message.lose { color: red; font-weight: bold; }
+@keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+}
