@@ -19,7 +19,7 @@
     <p>How long can you go?</p>
     <br>
     <br>
-    <button onclick="switchScreen('gameScreen'); startCountdown();">Start</button>
+    <button class="styled-button" onclick="switchScreen('gameScreen'); startCountdown();">Start</button>
   </div>
 
   <!-- Game Screen -->
@@ -36,14 +36,25 @@
         <button id="btn4" class="color-btn disabled" onclick="playerTurn(4)">4</button>
       </div>
     <div id="countdown" style="display:none; font-size: 24px; text-align: center;"></div>
+    <!--<button onclick="switchScreen('gameOverScreen')">End Game</button>-->
   </div>
 
   <!-- Game Over Screen -->
   <div id="gameOverScreen" class="screen">
     <h1>Game Over</h1>
     <h2>Top 10 High Scores</h2>
-    <ul id="highscoreList"></ul>
-    <button onclick="switchScreen('gameScreen'); resetGame();">Try Again</button>
+    <table id="highscoreTable">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Score</th>
+            </tr>
+        </thead>
+        <tbody id="highscoreList"></tbody>
+    </table>
+    <br>
+    <button class="styled-button" onclick="switchScreen('gameScreen'); resetGame();">Try Again</button>
   </div>
 
   <!-- New Highscore Screen -->
